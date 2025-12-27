@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: app
-        image: pavandath510/calci:v1
+        image: pavandath510/calci:latest
         ports:
         - containerPort: 8081
 
