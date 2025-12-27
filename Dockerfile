@@ -1,5 +1,11 @@
 FROM ubuntu:18.04
-RUN apt update && apt install openjdk-17-jdk -y && apt install wget -y
-RUN https://storage.googleapis.com/pavan-gcs/calci/calculator.jar
+
+RUN apt update && apt install -y openjdk-17-jdk wget
+
+# Download the JAR from the URL
+RUN wget https://storage.googleapis.com/pavan-gcs/calci/calculator.jar -O /app/calculator.jar
+
+WORKDIR /app
 EXPOSE 8081
-CMD ["java", "-jar", "calculator-0.0.1-SNAPSHOT.jar"]
+
+CMD ["java", "-jar", "calculator.jar"]
