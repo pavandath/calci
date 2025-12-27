@@ -1,12 +1,14 @@
-FROM ubuntu:18.04
+# Use a modern base image with Java 21
+FROM eclipse-temurin:21-jdk
 
-# Install Java
-RUN apt update && apt install -y openjdk-17-jdk
+# Set working directory
+WORKDIR /app
 
-# Use ADD to pull the JAR from the public URL
+# Copy the JAR from GCS into the container
 ADD https://storage.googleapis.com/pavan-gcs/calci/calculator.jar /app/calculator.jar
 
-WORKDIR /app
+# Expose application port
 EXPOSE 8081
 
+# Run the application
 CMD ["java", "-jar", "calculator.jar"]
