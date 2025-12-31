@@ -1,17 +1,22 @@
+# File: harness-calci-canary-nodeport.yaml
+---
+# Primary Deployment (Current/stable version)
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: harness-calci
+  name: harness-calci-primary
   namespace: default
 spec:
   replicas: 2
   selector:
     matchLabels:
       app: harness-calci
+      version: primary
   template:
     metadata:
       labels:
         app: harness-calci
+        version: primary
     spec:
       containers:
       - name: app
@@ -20,15 +25,61 @@ spec:
         - containerPort: 8080
 
 ---
+# Canary Deployment (New version to test)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: harness-calci-canary
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: harness-calci
+      version: canary
+  template:
+    metadata:
+      labels:
+        app: harness-calci
+        version: canary
+    spec:
+      containers:
+      - name: app
+        image: pavandath510/harness-py-app:latest
+        ports:
+        - containerPort: 8080
+
+---
+# Primary Service - NodePort (for stable version)
 apiVersion: v1
 kind: Service
 metadata:
-  name: harness-calci-app-service
+  name: harness-calci-primary-svc
   namespace: default
 spec:
   selector:
     app: harness-calci
+    version: primary  # Routes to primary pods ONLY
   ports:
   - port: 80
     targetPort: 8080
+    nodePort: 30001  # Fixed nodePort for primary
   type: NodePort
+
+---
+# Canary Service - NodePort (for new version)
+apiVersion: v1
+kind: Service
+metadata:
+  name: harness-calci-canary-svc
+  namespace: default
+spec:
+  selector:
+    app: harness-calci
+    version: canary  # Routes to canary pods ONLY
+  ports:
+  - port: 80
+    targetPort: 8080
+    nodePort: 30002  # Fixed nodePort for canary
+  type: NodePort
+
